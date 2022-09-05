@@ -25,11 +25,14 @@ mvcBuilders.ConfigureApplicationPartManager(apm =>
     FileInfo[] DynamicLinkLibrarys = DirInfo.GetFiles();
     foreach (FileInfo DynamicLinkLibrary in DynamicLinkLibrarys)
     {
-        var assembly = context.LoadFromStream(new FileStream(DynamicLinkLibrary.FullName, FileMode.Open));
-        //var assembly = Assembly.LoadFile(DynamicLinkLibrary.FullName);
-        var controllerAssemblyPart = new AssemblyPart(assembly);
-        apm.ApplicationParts.Add(controllerAssemblyPart);
-        PluginsLoadContexts.AddPluginContext(DynamicLinkLibrary.Name, context);
+        using (FileStream fs = new FileStream(DynamicLinkLibrary.FullName, FileMode.Open))
+        {
+            var assembly = context.LoadFromStream(fs);
+            //var assembly = Assembly.LoadFile(DynamicLinkLibrary.FullName);
+            var controllerAssemblyPart = new AssemblyPart(assembly);
+            apm.ApplicationParts.Add(controllerAssemblyPart);
+            PluginsLoadContexts.AddPluginContext(DynamicLinkLibrary.Name, context);
+        }
     }
 });
 

@@ -35,14 +35,20 @@ namespace ApiPlug.Controllers
         {
             if (PluginsLoadContexts.Any(name + ".dll"))
             {
+
                 //先操作ApplicationParts动态链接库
                 var matchedItem = _partManager.ApplicationParts.FirstOrDefault(p => p.Name == name);
-                _partManager.ApplicationParts.Remove(matchedItem);
-                //移除数组中的动态链接库
-                PluginsLoadContexts.RemovePluginContext(name + ".dll");
+                if (matchedItem != null)
+                {
+                    _partManager.ApplicationParts.Remove(matchedItem);
+                    matchedItem = null;
+                }
                 //更新Controllers
                 ActionDescriptorChangeProvider.Instance.HasChanged = true;
                 ActionDescriptorChangeProvider.Instance.TokenSource.Cancel();
+                //移除数组中的动态链接库
+                PluginsLoadContexts.RemovePluginContext(name + ".dll");
+                //GC.Collect();如果挂载时候用了using就不需要使用GC了
                 return "移除动态链接库成功";
             }
             else
@@ -64,15 +70,18 @@ namespace ApiPlug.Controllers
                 //读取动态链接库
                 var context = new CollectibleAssemblyLoadContext();
                 FileInfo FileInfo = new FileInfo(Path.Combine(Directory.GetCurrentDirectory(), "DynamicLinkLibrary/" + name + ".dll"));
-                var assembly = context.LoadFromStream(new FileStream(FileInfo.FullName, FileMode.Open));
-                var controllerAssemblyPart = new AssemblyPart(assembly);
-                //插入动态链接库
-                _partManager.ApplicationParts.Add(controllerAssemblyPart);
-                //插入数组
-                PluginsLoadContexts.AddPluginContext(name + ".dll", context);
-                //更新Controllers
-                ActionDescriptorChangeProvider.Instance.HasChanged = true;
-                ActionDescriptorChangeProvider.Instance.TokenSource.Cancel();
+                using (FileStream fs = new FileStream(FileInfo.FullName, FileMode.Open))
+                {
+                    var assembly = context.LoadFromStream(fs);
+                    var controllerAssemblyPart = new AssemblyPart(assembly);
+                    //插入动态链接库
+                    _partManager.ApplicationParts.Add(controllerAssemblyPart);
+                    //插入数组
+                    PluginsLoadContexts.AddPluginContext(name + ".dll", context);
+                    //更新Controllers
+                    ActionDescriptorChangeProvider.Instance.HasChanged = true;
+                    ActionDescriptorChangeProvider.Instance.TokenSource.Cancel();
+                }
                 return "添加动态链接库成功";
             }
             else
