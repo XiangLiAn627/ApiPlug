@@ -23,7 +23,9 @@ namespace ApiPlug.Controllers
         public void GenerateDynamicLinkLibrary(string code, string name)
         {
             //code就用TestOneController的代码做测试,name就用TestOne,控制器名不要和其他的控制器名重复
-            DynamicLinkLibraryExtensions.GenerateDynamicLinkLibrary(code, name);
+            List<string> codes = new List<string>();
+            codes.Add(code);
+            DynamicLinkLibraryExtensions.GenerateDynamicLinkLibrary(codes, name);
         }
         /// <summary>
         /// 删除动态链接库
@@ -35,7 +37,6 @@ namespace ApiPlug.Controllers
         {
             if (PluginsLoadContexts.Any(name + ".dll"))
             {
-
                 //先操作ApplicationParts动态链接库
                 var matchedItem = _partManager.ApplicationParts.FirstOrDefault(p => p.Name == name);
                 if (matchedItem != null)
@@ -45,7 +46,7 @@ namespace ApiPlug.Controllers
                 }
                 //更新Controllers
                 ActionDescriptorChangeProvider.Instance.HasChanged = true;
-                ActionDescriptorChangeProvider.Instance.TokenSource.Cancel();
+                ActionDescriptorChangeProvider.Instance.TokenSource!.Cancel();
                 //移除数组中的动态链接库
                 PluginsLoadContexts.RemovePluginContext(name + ".dll");
                 //GC.Collect();如果挂载时候用了using就不需要使用GC了
@@ -80,7 +81,7 @@ namespace ApiPlug.Controllers
                     PluginsLoadContexts.AddPluginContext(name + ".dll", context);
                     //更新Controllers
                     ActionDescriptorChangeProvider.Instance.HasChanged = true;
-                    ActionDescriptorChangeProvider.Instance.TokenSource.Cancel();
+                    ActionDescriptorChangeProvider.Instance.TokenSource!.Cancel();
                 }
                 return "添加动态链接库成功";
             }

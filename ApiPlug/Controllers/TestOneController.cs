@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
-namespace EPN.Api.Controllers
+namespace ApiPlug.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

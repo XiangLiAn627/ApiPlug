@@ -15,7 +15,7 @@ namespace ApiPlug
     {
         public static ActionDescriptorChangeProvider Instance { get; } = new ActionDescriptorChangeProvider();
 
-        public CancellationTokenSource TokenSource { get; private set; }
+        public CancellationTokenSource? TokenSource { get; private set; }
 
         public bool HasChanged { get; set; }
         /// <summary>

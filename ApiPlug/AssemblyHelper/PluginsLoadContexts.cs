@@ -10,8 +10,7 @@ namespace ApiPlug
     /// </summary>
     public static class PluginsLoadContexts
     {
-        private static Dictionary<string, CollectibleAssemblyLoadContext>
-            _pluginContexts = null;
+        private static Dictionary<string, CollectibleAssemblyLoadContext>? _pluginContexts = null;
 
         static PluginsLoadContexts()
         {
@@ -24,7 +23,7 @@ namespace ApiPlug
         /// <returns></returns>
         public static bool Any(string pluginName)
         {
-            return _pluginContexts.ContainsKey(pluginName);
+            return _pluginContexts!.ContainsKey(pluginName);
         }
         /// <summary>
         /// 移除动态链接库
@@ -32,7 +31,7 @@ namespace ApiPlug
         /// <param name="pluginName"></param>
         public static void RemovePluginContext(string pluginName)
         {
-            if (_pluginContexts.ContainsKey(pluginName))
+            if (_pluginContexts!.ContainsKey(pluginName))
             {
                 _pluginContexts[pluginName].Unload();
                 _pluginContexts.Remove(pluginName);
@@ -45,7 +44,7 @@ namespace ApiPlug
         /// <returns></returns>
         public static CollectibleAssemblyLoadContext GetContext(string pluginName)
         {
-            return _pluginContexts[pluginName];
+            return _pluginContexts![pluginName];
         }
         /// <summary>
         /// 添加动态链接库
@@ -55,7 +54,7 @@ namespace ApiPlug
         public static void AddPluginContext(string pluginName,
              CollectibleAssemblyLoadContext context)
         {
-            _pluginContexts.Add(pluginName, context);
+            _pluginContexts!.Add(pluginName, context);
         }
     }
 }
